@@ -21,4 +21,6 @@ public interface DishService {
 
 	public List<Rating> getAllRatingForDish(String dishIdAsString);
 
+	DishDto findDishById(int dishId);
+
 }

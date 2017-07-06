@@ -29,23 +29,29 @@ public class DishController {
     	return dishService.getAllAVailableDishes();
     }
     
+    @RequestMapping(value="/{dishIdAsString}", method = RequestMethod.GET)
+    public DishDto getOneDish(@PathVariable String dishIdAsString) throws SQLException {
+    	return dishService.findDishById(Integer.valueOf(dishIdAsString));
+    }
+
     @RequestMapping(value="/{dishIdAsString}/ratings", method = RequestMethod.GET)
     public List<Rating> getAllRatingForDish(@PathVariable String dishIdAsString) throws SQLException {
     	return dishService.getAllRatingForDish(dishIdAsString);
     }
+
     @RequestMapping(value="", method = RequestMethod.POST)
     public DishDto createDish(@RequestBody @Valid DishDto dish) throws SQLException {
     	return dishService.createDish(dish);
     }
 
     @RequestMapping(value="/{dishIdAsString}", method = RequestMethod.PUT)
-    DishDto updateDish(@PathVariable String dishIdAsString, @RequestBody @Valid DishDto dish) throws SQLException {
+    public DishDto updateDish(@PathVariable String dishIdAsString, @RequestBody @Valid DishDto dish) throws SQLException {
     	dish.setId(Integer.valueOf(dishIdAsString));
     	return dishService.updateDish(dish);
 	}
 	
     @RequestMapping(value="/{dishIdAsString}", method = RequestMethod.DELETE)
-	void deleteDish(@PathVariable String dishIdAsString) throws SQLException {
+	public void deleteDish(@PathVariable String dishIdAsString) throws SQLException {
     	dishService.deleteDish(dishIdAsString);
 	}
 

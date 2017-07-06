@@ -159,6 +159,7 @@ public class DishServiceImpl implements DishService {
 		}
 	}
 	
+	@Override
 	public DishDto findDishById(int dishId) {
 		
 		DishDto dish = new DishDto();
