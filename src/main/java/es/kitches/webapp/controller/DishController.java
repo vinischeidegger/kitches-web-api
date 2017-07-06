@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import es.kitches.webapp.model.Dish;
+import es.kitches.webapp.model.Rating;
 import es.kitches.webapp.model.dto.DishDto;
 import es.kitches.webapp.service.DishService;
 
@@ -28,6 +29,10 @@ public class DishController {
     	return dishService.getAllAVailableDishes();
     }
     
+    @RequestMapping(value="/{dishIdAsString}/ratings", method = RequestMethod.GET)
+    public List<Rating> getAllRatingForDish(@PathVariable String dishIdAsString) throws SQLException {
+    	return dishService.getAllRatingForDish(dishIdAsString);
+    }
     @RequestMapping(value="", method = RequestMethod.POST)
     public DishDto createDish(@RequestBody @Valid DishDto dish) throws SQLException {
     	return dishService.createDish(dish);

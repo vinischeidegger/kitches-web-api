@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import es.kitches.webapp.dao.DBConnection;
 import es.kitches.webapp.model.Dish;
+import es.kitches.webapp.model.Rating;
 import es.kitches.webapp.model.dto.DishDto;
 import es.kitches.webapp.service.DishService;
 
@@ -74,7 +75,7 @@ public class DishServiceImpl implements DishService {
 	}
 
 	@Override
-	public DishDto createDish(DishDto dish) throws SQLException {
+	public DishDto createDish(DishDto dish) {
     	
 		String sql = "INSERT INTO kitches.dish (dishName, dishImageUrl, dishDescription, chefId, availablePortions, price) VALUES (?,?,?,?,?,?)";
 
@@ -104,7 +105,6 @@ public class DishServiceImpl implements DishService {
 		}
 		catch(SQLException e){
 			LOGGER.error(e.getMessage());
-			throw e;
 		}
 		finally{
 			
@@ -114,7 +114,7 @@ public class DishServiceImpl implements DishService {
 	}
 
 	@Override
-	public DishDto updateDish(DishDto dish) throws SQLException {
+	public DishDto updateDish(DishDto dish) {
 		
 		DishDto foundDish = new DishDto();
 		
@@ -134,7 +134,6 @@ public class DishServiceImpl implements DishService {
 		}
 		catch(SQLException e){
 			LOGGER.error(e.getMessage());
-			throw e;
 		}
 		finally{
 			
@@ -146,12 +145,11 @@ public class DishServiceImpl implements DishService {
 
 	@Override
 	public void deleteDish(String dishIdAsString) {
-		String sql = "DELETE FROM kitches.dish d " +
-				"WHERE d.id = ?";
+		String sql = "DELETE FROM kitches.dish WHERE id = ?";
 		try {
 			PreparedStatement ps = conn.getConn().prepareStatement(sql);
 			ps.setInt(1, Integer.valueOf(dishIdAsString));
-		    ps.executeQuery();
+		    ps.executeUpdate();
 		}
 		catch(SQLException e){
 			LOGGER.error(e.getMessage());
@@ -203,4 +201,42 @@ public class DishServiceImpl implements DishService {
 		return dish;
 	}
 
+	@Override
+	public List<Rating> getAllRatingForDish(String dishIdAsString) {
+    	List<Rating> ratings = new ArrayList<Rating>();
+    	
+		String sql = "SELECT r.rating_id, " +
+					"		 r.dish_id, " +
+					"		 r.user_id, " +
+					"		 COALESCE(u.user_name, 'UNKNOWN') user_name, " +
+					"		 r.stars, " +
+					"        r.comment " +
+					"FROM kitches.dish_ratings r " +
+					"left join kitches.user u " +
+					"on r.user_id = u.id " +
+					"WHERE r.dish_id = ?";
+
+		try (PreparedStatement ps = conn.getConn().prepareStatement(sql)){
+			
+			ps.setInt(1, Integer.valueOf(dishIdAsString));
+			ResultSet rs = ps.executeQuery();
+		    
+			while (rs.next()) {
+		    	
+		    	Rating newRating = new Rating(rs.getInt("rating_id"), rs.getInt("dish_id"),
+		    			rs.getInt("user_id"), rs.getString("user_name"), rs.getDouble("stars"), rs.getString("comment"));
+		    	ratings.add(newRating);
+		    }
+		    rs.close();
+			ps.close();
+		}
+		catch(SQLException e){
+			LOGGER.error(e.getMessage());
+		}
+		finally{
+			
+		}
+    	
+		return ratings;	
+	}
 }
